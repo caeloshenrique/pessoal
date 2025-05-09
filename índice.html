@@ -7,13 +7,47 @@
   <!-- Importar CSS do GrapesJS -->
   <link rel="stylesheet" href="https://unpkg.com/grapesjs/dist/css/grapes.min.css">
   <style>
-    body { margin: 0; }
-    #editor { height: 100vh; }
-    #export-code { margin: 10px; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    #editor {
+      height: calc(100vh - 50px);
+    }
+    .header {
+      background: #f4f4f4;
+      padding: 10px;
+      text-align: center;
+    }
+    #export-code {
+      padding: 10px 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    #export-code:hover {
+      background: #0056b3;
+    }
+    .gjs-pn-panel {
+      background: #fff;
+      border-bottom: 1px solid #ddd;
+    }
+    .gjs-block {
+      padding: 10px;
+      margin: 5px;
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
-  <button id="export-code">Exportar Código</button>
+  <div class="header">
+    <button id="export-code">Exportar Código</button>
+  </div>
   <div id="editor"></div>
 
   <!-- Importar JS do GrapesJS -->
@@ -25,12 +59,28 @@
       fromElement: true,
       height: '100%',
       storageManager: false, // Desativar salvamento automático
-      panels: { defaults: [] }, // Personalizar painéis
       blockManager: {
         blocks: [
-          { id: 'text', label: 'Texto', content: '<div>Insira seu texto aqui</div>' },
-          { id: 'image', label: 'Imagem', content: '<img src="https://via.placeholder.com/150" />' },
-          { id: 'button', label: 'Botão', content: '<button>Clique aqui</button>' }
+          {
+            id: 'text',
+            label: 'Texto',
+            content: '<div style="padding: 10px;">Insira seu texto aqui</div>'
+          },
+          {
+            id: 'image',
+            label: 'Imagem',
+            content: '<img src="https://via.placeholder.com/300x200" style="max-width: 100%;" />'
+          },
+          {
+            id: 'button',
+            label: 'Botão',
+            content: '<button style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px;">Clique aqui</button>'
+          },
+          {
+            id: 'section',
+            label: 'Seção',
+            content: '<section style="padding: 20px; background: #f8f9fa; margin: 10px;">Adicione conteúdo aqui</section>'
+          }
         ]
       },
       styleManager: {
@@ -40,8 +90,37 @@
             properties: [
               { name: 'Cor de fundo', property: 'background-color', type: 'color' },
               { name: 'Cor do texto', property: 'color', type: 'color' },
-              { name: 'Tamanho da fonte', property: 'font-size', type: 'number', units: ['px', 'rem'] }
+              { name: 'Tamanho da fonte', property: 'font-size', type: 'number', units: ['px', 'rem'] },
+              { name: 'Margem', property: 'margin', type: 'composite', properties: [
+                { name: 'Topo', property: 'margin-top' },
+                { name: 'Direita', property: 'margin-right' },
+                { name: 'Baixo', property: 'margin-bottom' },
+                { name: 'Esquerda', property: 'margin-left' }
+              ]},
+              { name: 'Padding', property: 'padding', type: 'composite', properties: [
+                { name: 'Topo', property: 'padding-top' },
+                { name: 'Direita', property: 'padding-right' },
+                { name: 'Baixo', property: 'padding-bottom' },
+                { name: 'Esquerda', property: 'padding-left' }
+              ]}
             ]
+          },
+          {
+            name: 'Layout',
+            properties: [
+              { name: 'Largura', property: 'width', type: 'number', units: ['px', '%'] },
+              { name: 'Altura', property: 'height', type: 'number', units: ['px', '%'] },
+              { name: 'Display', property: 'display', type: 'select', options: ['block', 'inline', 'inline-block', 'flex', 'grid'] }
+            ]
+          }
+        ]
+      },
+      panels: {
+        defaults: [
+          {
+            id: 'basic-actions',
+            el: '.header',
+            buttons: []
           }
         ]
       }
@@ -52,21 +131,29 @@
       const html = editor.getHtml();
       const css = editor.getCss();
       const code = `
-        <html>
-          <head>
-            <style>${css}</style>
-          </head>
-          <body>${html}</body>
-        </html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Site Gerado</title>
+  <style>
+    ${css}
+  </style>
+</head>
+<body>
+  ${html}
+</body>
+</html>
       `;
-      alert('Código gerado:\n' + code);
-      // Para exportar como arquivo, você pode usar a biblioteca JSZip ou criar um Blob
+      // Criar e baixar o arquivo HTML
       const blob = new Blob([code], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'site.html';
+      a.download = 'site-gerado.html';
       a.click();
+      URL.revokeObjectURL(url);
     });
   </script>
 </body>
