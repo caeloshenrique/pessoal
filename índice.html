@@ -1,75 +1,73 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ScriptSite Pro | Criação Inteligente de Websites</title>
-    <!-- Adicione isto para evitar erros de ícones -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #2a3f54;
-            --secondary: #1abb9c;
-            --accent: #e74c3c;
-            --light: #f7f9fc;
-            --dark: #1a2a3a;
-            --text: #34495e;
-            --transition: all 0.3s ease;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-        }
-        /* Estilos básicos para evitar erros de renderização */
-        header, section, footer {
-            display: block;
-            width: 100%;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor Visual de Sites</title>
+  <!-- Importar CSS do GrapesJS -->
+  <link rel="stylesheet" href="https://unpkg.com/grapesjs/dist/css/grapes.min.css">
+  <style>
+    body { margin: 0; }
+    #editor { height: 100vh; }
+    #export-code { margin: 10px; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+  </style>
 </head>
 <body>
-    <!-- Estrutura simplificada para teste -->
-    <header style="background: white; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between;">
-            <a href="#" style="text-decoration: none; color: var(--primary); font-weight: bold; font-size: 24px;">
-                <i class="fas fa-code" style="color: var(--secondary);"></i> ScriptSite
-            </a>
-            <nav>
-                <a href="#features" style="margin: 0 15px; text-decoration: none; color: var(--text);">Recursos</a>
-                <a href="#pricing" style="margin: 0 15px; text-decoration: none; color: var(--text);">Planos</a>
-            </nav>
-        </div>
-    </header>
+  <button id="export-code">Exportar Código</button>
+  <div id="editor"></div>
 
-    <section style="padding: 100px 20px; text-align: center; background: linear-gradient(135deg, var(--primary), var(--dark)); color: white;">
-        <h1 style="font-size: 2.5rem;">Crie Sites com Scripts Automatizados</h1>
-        <p style="max-width: 700px; margin: 20px auto;">Transforme seus scripts em websites profissionais em minutos</p>
-        <a href="#pricing" style="display: inline-block; padding: 12px 30px; background: var(--secondary); color: white; text-decoration: none; border-radius: 30px; margin: 10px;">Comece Agora</a>
-    </section>
+  <!-- Importar JS do GrapesJS -->
+  <script src="https://unpkg.com/grapesjs"></script>
+  <script>
+    // Inicializar o editor GrapesJS
+    const editor = grapesjs.init({
+      container: '#editor',
+      fromElement: true,
+      height: '100%',
+      storageManager: false, // Desativar salvamento automático
+      panels: { defaults: [] }, // Personalizar painéis
+      blockManager: {
+        blocks: [
+          { id: 'text', label: 'Texto', content: '<div>Insira seu texto aqui</div>' },
+          { id: 'image', label: 'Imagem', content: '<img src="https://via.placeholder.com/150" />' },
+          { id: 'button', label: 'Botão', content: '<button>Clique aqui</button>' }
+        ]
+      },
+      styleManager: {
+        sectors: [
+          {
+            name: 'Geral',
+            properties: [
+              { name: 'Cor de fundo', property: 'background-color', type: 'color' },
+              { name: 'Cor do texto', property: 'color', type: 'color' },
+              { name: 'Tamanho da fonte', property: 'font-size', type: 'number', units: ['px', 'rem'] }
+            ]
+          }
+        ]
+      }
+    });
 
-    <!-- Adicione este script para verificar erros -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Página carregada com sucesso');
-            
-            // Verifique se Font Awesome está carregado
-            if(typeof FontAwesome === 'undefined') {
-                console.error('Font Awesome não carregado');
-                // Carregue fallback
-                const faCSS = document.createElement('link');
-                faCSS.rel = 'stylesheet';
-                faCSS.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
-                document.head.appendChild(faCSS);
-            }
-        });
-
-        // Tratamento básico de erros
-        window.onerror = function(message, source, lineno, colno, error) {
-            console.error('Erro:', message, 'em', source, 'linha:', lineno);
-            return true;
-        };
-    </script>
+    // Exportar código ao clicar no botão
+    document.getElementById('export-code').addEventListener('click', () => {
+      const html = editor.getHtml();
+      const css = editor.getCss();
+      const code = `
+        <html>
+          <head>
+            <style>${css}</style>
+          </head>
+          <body>${html}</body>
+        </html>
+      `;
+      alert('Código gerado:\n' + code);
+      // Para exportar como arquivo, você pode usar a biblioteca JSZip ou criar um Blob
+      const blob = new Blob([code], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'site.html';
+      a.click();
+    });
+  </script>
 </body>
 </html>
